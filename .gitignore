@@ -1,0 +1,26 @@
+# Compilados de Java
+*.class
+*.jar
+*.war
+
+# Carpetas de construcción de Maven (Crucial ignorarlas)
+target/
+out/
+
+# Archivos de configuración de IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Archivos generados por el Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Logs y temporales
+*.log
+
+# Variables de entorno, certificados y credenciales
+.env
+*.jks
+*.p12
