@@ -17,7 +17,7 @@ public class Episodio {
     public void procesar(){
         System.out.println("Iniciando procesamineto de : " + this.titulo + "...");
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1250);
 
         }catch (InterruptedException e){
             System.out.println("Error al procesar el episodio");
