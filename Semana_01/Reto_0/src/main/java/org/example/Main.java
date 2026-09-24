@@ -6,10 +6,7 @@ public class Main {
 
         System.out.println("--- INICIANDO UDITVERSUM ---");
 
-
         Plataforma plataforma = new Plataforma();
-
-
         plataforma.agregarEspisodio(new Episodio("Diseño 3d - Intro", 45));
         plataforma.agregarEspisodio(new Episodio("Animacion", 60));
         plataforma.agregarEspisodio(new Episodio("Texturas", 50));
