@@ -20,7 +20,7 @@ Recorre una matriz con 5 tipos de contenido (*Series, Películas, Documentales, 
 3. Vacía el búfer de salida del proceso (`InputStream`).
 4. Captura el código de salida mediante `waitFor()` para determinar e imprimir si el servicio está **ACTIVO** o **CAÍDO**.
 
-![Ejecución del Monitor UDITflix](src/main/java/org/example/image/ejecucion_monitor.png)
+![Ejecución del Monitor UDITflix](src/main/java/org/example/image/image.png)
 
 ---
 
