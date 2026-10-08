@@ -3,10 +3,10 @@ package org.example;
 import java.io.IOException;
 
 public class CodigoSalida {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.out.println("COMPROBACION DE SERVIDOR");
-        try{
-            ProcessBuilder pb = new ProcessBuilder("ping","-n","1", "8.8.8.8");
+        try {
+            ProcessBuilder pb = new ProcessBuilder("ping", "-c", "1", "8.8.8.8");
 
             Process proceso = pb.start();
 
@@ -16,15 +16,14 @@ public class CodigoSalida {
 
             System.out.println("codigo salida" + codigoSalida);
 
-            if (codigoSalida ==0){
+            if (codigoSalida == 0) {
                 System.out.println("Activo");
             } else {
                 System.out.println("Caido");
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Error al lanzar proceso");
-        }
-        catch (InterruptedException e){
+        } catch (InterruptedException e) {
             System.out.println("A LA ESPERA");
         }
         System.out.println("FIN DE LA COMPROBACION");
