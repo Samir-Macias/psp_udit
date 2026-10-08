@@ -1,5 +1,6 @@
 Reto 2 · Pipeline de Auditoría UDITversum (Fase 1)
-![Captura de pantalla 2026-10-08 a las 21.04.42.png](../../../../../../../../var/folders/ct/0gm3rndn4js6x_vh2smj27k40000gn/T/TemporaryItems/NSIRD_screencaptureui_O7mUu1/Captura%20de%20pantalla%202026-10-08%20a%20las%2021.04.42.png)
+<img width="618" height="359" alt="Captura de pantalla 2026-10-08 a las 21 09 28" src="https://github.com/user-attachments/assets/bb8a3fec-648f-4930-a9a7-a3560602aa9b" />
+
 Módulo: 0490 · Programación de Servicios y Procesos
 Autor/a: Samir Adrian Macías Hernández
 Tecnología: Java + ProcessBuilder (procesos del sistema operativo macOS)
@@ -11,24 +12,24 @@ Espera a que ambas terminen.
 Lee el código de salida de cada una.
 Según el resultado combinado, toma una decisión y abre una aplicación del sistema (TextEdit) o un recurso externo (video en YouTube).
 Plaintext
-┌──────────────┐
-│  Mi programa │
-│   (Java)     │
-└──────┬───────┘
-│ start()          start()
-┌──────┴──────┐    ┌──────┴──────┐
-▼                         ▼
-┌───────────┐             ┌───────────┐
-│  ping A   │             │  ping B   │   ← corren a la vez (paralelo)
-└─────┬─────┘             └─────┬─────┘
-│ waitFor()               │ waitFor()
-└───────────┬─────────────┘
-▼
-¿códigos de salida?
-│
-┌───────────┴───────────┐
-▼                       ▼
-TextEdit             Video de YouTube
+        ┌──────────────┐
+        │  Mi programa │
+        │   (Java)     │
+        └──────┬───────┘
+               │ start()          start()
+        ┌──────┴──────┐    ┌──────┴──────┐
+        ▼                         ▼
+  ┌───────────┐             ┌───────────┐
+  │  ping A   │             │  ping B   │   ← corren a la vez (paralelo)
+  └─────┬─────┘             └─────┬─────┘
+        │ waitFor()               │ waitFor()
+        └───────────┬─────────────┘
+                    ▼
+          ¿códigos de salida?
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+     TextEdit             Video de YouTube
 🧠 Antes de empezar: planifico
 Con mis palabras, ¿qué me pide el reto?
 Ejecutar dos órdenes ping de forma simultánea en el sistema operativo, recoger sus códigos de terminación para saber si ambas tuvieron éxito o no, y dependiendo de eso abrir la aplicación correspondiente o una dirección URL externa sin bloquear la ejecución en serie antes del lanzamiento.
@@ -98,45 +99,45 @@ Abrir la app directamente con su nombre en Mac	Lanzaba IOException por no encont
 Abrir un enlace de YouTube al fallar el ping	Quería que se abriera el navegador por defecto sin especificar Chrome o Safari	Utilicé new ProcessBuilder("open", url).start(), aprovechando que en macOS open detecta las URL e invoca el navegador predeterminado.
 🧠 Análisis técnico (preparación para la defensa)
 1. Secuencial vs paralelo
-   Las líneas exactas que garantizan el paralelismo son las llamadas consecutivas a .start():
-   Java
-   Process p1 = new ProcessBuilder("ping", "-c", "1", "127.0.0.1").start();
-   Process p2 = new ProcessBuilder("ping", "-c", "1", "error.invalid").start();
-   .start() no bloquea el hilo principal; envía la orden al Kernel del sistema operativo y continúa inmediatamente. Si pusiera p1.waitFor() justo antes de declarar p2, Java se detendría esperando a que p1 terminara en el SO antes de iniciar p2, haciendo la ejecución secuencial y duplicando el tiempo total.
+Las líneas exactas que garantizan el paralelismo son las llamadas consecutivas a .start():
+Java
+Process p1 = new ProcessBuilder("ping", "-c", "1", "127.0.0.1").start();
+Process p2 = new ProcessBuilder("ping", "-c", "1", "error.invalid").start();
+.start() no bloquea el hilo principal; envía la orden al Kernel del sistema operativo y continúa inmediatamente. Si pusiera p1.waitFor() justo antes de declarar p2, Java se detendría esperando a que p1 terminara en el SO antes de iniciar p2, haciendo la ejecución secuencial y duplicando el tiempo total.
 2. El código de salida (exit code)
-   .waitFor() devuelve un entero (int). El estándar del SO define 0 para una finalización limpia y exitosa. Se eligió el 0 para el éxito porque representa la ausencia de errores, dejando todos los demás enteros positivos para catalogar diferentes causas o tipos de fallos.
+.waitFor() devuelve un entero (int). El estándar del SO define 0 para una finalización limpia y exitosa. Se eligió el 0 para el éxito porque representa la ausencia de errores, dejando todos los demás enteros positivos para catalogar diferentes causas o tipos de fallos.
 3. Lógica condicional
-   Java
-   if (codigoSalidap1 == 0 && codigoSalidap2 == 0) {
-   System.out.println("✔ Ambos pings correctos. Abriendo TextEdit...");
-   abrirAplicacionMac("TextEdit");
-   } else {
-   System.out.println("⚠ Al menos un ping ha fallado. Abriendo Calculadora...");
-   abrirUrlMac("https://www.youtube.com/watch?v=NtTmFtxVWsI");
-   }
-   Se utiliza && porque se requiere estricta salud de red en ambos nodos para abrir la aplicación principal (TextEdit). Si falla cualquiera, la auditoría entra al bloque else abriendo el video en YouTube.
+Java
+if (codigoSalidap1 == 0 && codigoSalidap2 == 0) {
+    System.out.println("✔ Ambos pings correctos. Abriendo TextEdit...");
+    abrirAplicacionMac("TextEdit");
+} else {
+    System.out.println("⚠ Al menos un ping ha fallado. Abriendo Calculadora...");
+    abrirUrlMac("https://www.youtube.com/watch?v=NtTmFtxVWsI");
+}
+Se utiliza && porque se requiere estricta salud de red en ambos nodos para abrir la aplicación principal (TextEdit). Si falla cualquiera, la auditoría entra al bloque else abriendo el video en YouTube.
 4. Gestión de excepciones
-   Se entra en el catch (IOException e) si el sistema operativo es incapaz de instanciar o encontrar el ejecutable en el disco (por ejemplo, si intentáramos ejecutar pizzbuilder o un binario inexistente). Esto difiere del código de salida devuelto por waitFor(), el cual se obtiene cuando el ejecutable sí existe y corre, pero sus comprobaciones internas fallan.
-   🛡️ Preparación para la defensa: ¿sabría hacer esto en directo?
-   [x] Cambiar la condición para que se abra el video de YouTube solo si falla uno de los dos pings.
-   [x] Añadir un tercer ping en paralelo y que la decisión dependa de los tres.
-   [x] Mostrar el PID de cada proceso al lanzarlo (p1.pid()).
-   [x] Medir y mostrar cuántos milisegundos tarda en total el programa (System.currentTimeMillis()).
-   [x] Hacer que el programa funcione en macOS (ping -c y open).
-   [x] Provocar a propósito una IOException y mostrar un mensaje claro al usuario.
-   [x] Explicar qué pasaría si quito el waitFor().
-   🧭 Del Reto 1 al Reto 2: cómo di el salto
-   ¿Qué hacía mi Reto 1 que aquí ya no me sirve tal cual? Esperar el cierre de cada proceso justo tras su lanzamiento dentro de un flujo secuencial.
-   ¿Qué he tenido que cambiar para que dos procesos corran simultáneamente? Separar la fase de arranque de los procesos (invocar todos los .start()) de la fase de sincronización y lectura (invocar todos los .waitFor()).
-   ¿Qué ventaja tiene lanzar en paralelo? La ventaja es la reducción del tiempo global de ejecución al aprovechar los núcleos del procesador. El reto técnico es que debes coordinar y sincronizar las respuestas de múltiples subprocesos asíncronos antes de tomar decisiones.
-   🧠 Qué he aprendido
-   start() vs waitFor(): start() delega la tarea al SO y sigue adelante; waitFor() detiene el hilo Java hasta que el subproceso concluye.
-   Paralelismo real: Ocurre porque el sistema operativo gestiona los subprocesos de forma independiente en el procesador sin que Java los fuerce a esperar turno.
-   IOException vs ping fallido: IOException salta cuando el sistema operativo no puede arrancar el comando; un ping fallido sí arranca pero retorna un valor != 0.
-   🤝 Declaración de autoría y aprendizaje
-   [x] Confirmo que he diseñado, programado y depurado este código aplicando mi propio razonamiento, y que puedo explicarlo línea a línea.
-   [x] Entiendo que durante la defensa el profesor me pedirá realizar pequeñas modificaciones sobre este código para comprobar mi comprensión del multiproceso.
-   📂 Estructura del proyecto
-   Plaintext
-   src/main/java/org/example/   → PipelineAuditoria.java (clase principal con main)
-   README.md                    → Documentación del Reto 2
+Se entra en el catch (IOException e) si el sistema operativo es incapaz de instanciar o encontrar el ejecutable en el disco (por ejemplo, si intentáramos ejecutar pizzbuilder o un binario inexistente). Esto difiere del código de salida devuelto por waitFor(), el cual se obtiene cuando el ejecutable sí existe y corre, pero sus comprobaciones internas fallan.
+🛡️ Preparación para la defensa: ¿sabría hacer esto en directo?
+[x] Cambiar la condición para que se abra el video de YouTube solo si falla uno de los dos pings.
+[x] Añadir un tercer ping en paralelo y que la decisión dependa de los tres.
+[x] Mostrar el PID de cada proceso al lanzarlo (p1.pid()).
+[x] Medir y mostrar cuántos milisegundos tarda en total el programa (System.currentTimeMillis()).
+[x] Hacer que el programa funcione en macOS (ping -c y open).
+[x] Provocar a propósito una IOException y mostrar un mensaje claro al usuario.
+[x] Explicar qué pasaría si quito el waitFor().
+🧭 Del Reto 1 al Reto 2: cómo di el salto
+¿Qué hacía mi Reto 1 que aquí ya no me sirve tal cual? Esperar el cierre de cada proceso justo tras su lanzamiento dentro de un flujo secuencial.
+¿Qué he tenido que cambiar para que dos procesos corran simultáneamente? Separar la fase de arranque de los procesos (invocar todos los .start()) de la fase de sincronización y lectura (invocar todos los .waitFor()).
+¿Qué ventaja tiene lanzar en paralelo? La ventaja es la reducción del tiempo global de ejecución al aprovechar los núcleos del procesador. El reto técnico es que debes coordinar y sincronizar las respuestas de múltiples subprocesos asíncronos antes de tomar decisiones.
+🧠 Qué he aprendido
+start() vs waitFor(): start() delega la tarea al SO y sigue adelante; waitFor() detiene el hilo Java hasta que el subproceso concluye.
+Paralelismo real: Ocurre porque el sistema operativo gestiona los subprocesos de forma independiente en el procesador sin que Java los fuerce a esperar turno.
+IOException vs ping fallido: IOException salta cuando el sistema operativo no puede arrancar el comando; un ping fallido sí arranca pero retorna un valor != 0.
+🤝 Declaración de autoría y aprendizaje
+[x] Confirmo que he diseñado, programado y depurado este código aplicando mi propio razonamiento, y que puedo explicarlo línea a línea.
+[x] Entiendo que durante la defensa el profesor me pedirá realizar pequeñas modificaciones sobre este código para comprobar mi comprensión del multiproceso.
+📂 Estructura del proyecto
+Plaintext
+src/main/java/org/example/   → PipelineAuditoria.java (clase principal con main)
+README.md                    → Documentación del Reto 2
