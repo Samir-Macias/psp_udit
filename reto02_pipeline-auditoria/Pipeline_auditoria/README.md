@@ -1,5 +1,6 @@
 # 🚀 Reto 2: Pipeline de Auditoría UDITversum (Fase 1)
-![Captura de pantalla 2026-10-08 a las 21.22.29.png](../../../../../../../../var/folders/ct/0gm3rndn4js6x_vh2smj27k40000gn/T/TemporaryItems/NSIRD_screencaptureui_C158XL/Captura%20de%20pantalla%202026-10-08%20a%20las%2021.22.29.png)
+<img width="1416" height="656" alt="Captura de pantalla 2026-10-09 a las 13 04 17" src="https://github.com/user-attachments/assets/bc54c8ed-2617-45c2-a94e-a76b5b36095c" />
+
 
 
 * 📘 **Módulo:** `0490 · Programación de Servicios y Procesos`
