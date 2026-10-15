@@ -166,3 +166,17 @@ Se utiliza `&&` porque se requiere estricta conectividad en ambos nodos para val
 
 - [x] Confirmo que he diseñado y programado este código aplicando mi propio razonamiento.
 - [x] Entiendo el salto técnico entre ejecución secuencial y paralela.
+
+---
+
+## 💭 Reflexiones del Reto B
+
+<img width="1416" height="656" alt="Captura de pantalla 2026-10-15" src="./src/main/resources/image.png" />
+
+### 1. ¿Qué sistemas profesionales utilizan el patrón Retry?
+
+El patrón Retry se utiliza en sistemas que dependen de redes o servicios externos y pueden sufrir fallos temporales. Por ejemplo, una pasarela de pago puede reintentar una petición si se pierde la conexión, y los servicios en la nube pueden volver a intentar una operación cuando reciben un error temporal o una respuesta de límite de solicitudes. Estos reintentos deben tener un límite y una espera entre ellos. En operaciones como los pagos también hay que evitar duplicar una transacción si el primer intento sí llegó a procesarse, aunque no se recibiera su respuesta.
+
+### 2. ¿Por qué es importante limitar los reintentos al auditar 50 servidores?
+
+Cada intento adicional consume tiempo y recursos de red. Si se reintentara indefinidamente contra servidores que no responden, la auditoría podría tardar demasiado y generar tráfico innecesario, dificultando aún más la recuperación de los sistemas. Al poner un máximo de tres reintentos y una espera de un segundo antes de cada uno, el programa acota cuánto puede prolongarse la comprobación de cada servidor y evita insistir sin fin. Al auditar 50 servidores con problemas, ese límite hace que el tiempo y la carga sean más previsibles; además, si se procesan de forma secuencial, las demoras de cada servidor se acumulan.
