@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UDITflix · Hilos en Java · Semana 6 (PSP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1016; --panel:#131923; --panel2:#18202d; --line:#243044;
+  --txt:#d6e0ee; --dim:#7f8da3;
+  --cyan:#00f2fe; --green:#00f5a0; --orange:#ff9f43; --red:#ff5252; --violet:#a78bfa;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.55;
+  background-image:linear-gradient(rgba(0,242,254,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,242,254,.035) 1px,transparent 1px);
+  background-size:36px 36px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{padding:56px 0 28px}
+h1{font-family:var(--mono);font-weight:800;font-size:clamp(1.9rem,5vw,3.4rem);margin:0 0 12px;letter-spacing:-.02em;line-height:1.1}
+h1 .cy{color:var(--cyan);text-shadow:0 0 24px rgba(0,242,254,.45)}
+.lead{max-width:68ch;color:var(--dim);font-size:1.05rem;margin:0}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+nav a{font-family:var(--mono);font-size:.82rem;color:var(--cyan);border:1px solid var(--line);padding:7px 12px;border-radius:6px;text-decoration:none;background:var(--panel)}
+nav a:hover,nav a:focus-visible{border-color:var(--cyan);outline:none}
+section{padding:40px 0}
+h2{font-family:var(--mono);font-size:clamp(1.25rem,3vw,1.8rem);margin:0 0 8px}
+h2 .tag{color:var(--orange)}
+.sub{color:var(--dim);max-width:72ch;margin:0 0 22px}
+.bar-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+button{font-family:var(--mono);font-weight:600;font-size:.92rem;cursor:pointer;border-radius:8px;padding:12px 20px;transition:.18s}
+.btn{background:var(--cyan);color:#04202a;border:0;box-shadow:0 0 22px rgba(0,242,254,.3)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(0,242,254,.5)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
+.ghost:hover{color:var(--txt);border-color:var(--dim)}
+button:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;transition:border-color .3s}
+.card.run{border-color:rgba(0,242,254,.5)}
+.card.done{border-color:rgba(0,245,160,.6)}
+.card h3{font-family:var(--mono);font-size:1rem;margin:0 0 4px}
+.card .hint{color:var(--dim);font-size:.88rem;margin:0 0 14px}
+.code{font-family:var(--mono);font-size:.78rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:0 0 16px;overflow-x:auto;white-space:pre;color:var(--txt)}
+.k{color:var(--violet)}.m{color:var(--cyan)}.s{color:var(--green)}.c{color:var(--dim)}
+.job{margin-bottom:12px}
+.job .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.8rem;margin-bottom:4px;gap:8px}
+.job .st{color:var(--dim)}
+.track{height:12px;background:var(--bg);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--cyan);transition:background .2s}
+.fill.ok{background:var(--green)}
+.clock{display:flex;align-items:baseline;justify-content:space-between;border-top:1px dashed var(--line);margin-top:16px;padding-top:14px;font-family:var(--mono)}
+.clock .lbl{color:var(--dim);font-size:.82rem}
+.clock .val{font-size:2.1rem;font-weight:800;color:var(--orange);font-variant-numeric:tabular-nums}
+.card.done .clock .val{color:var(--green)}
+.verdict{margin-top:18px;padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);font-family:var(--mono);min-height:58px}
+.verdict b{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.86rem}
+th{text-align:left;color:var(--dim);font-weight:400;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid rgba(36,48,68,.6);vertical-align:middle}
+.badge{display:inline-block;min-width:140px;text-align:center;padding:4px 10px;border-radius:5px;font-weight:600;font-size:.78rem;border:1px solid;transition:.25s}
+.NEW{color:var(--dim);border-color:var(--dim);background:rgba(127,141,163,.1)}
+.RUNNABLE{color:var(--cyan);border-color:var(--cyan);background:rgba(0,242,254,.1)}
+.TIMED_WAITING{color:var(--orange);border-color:var(--orange);background:rgba(255,159,67,.12);animation:pulse 1.2s infinite}
+.TERMINATED{color:var(--green);border-color:var(--green);background:rgba(0,245,160,.1)}
+@keyframes pulse{50%{box-shadow:0 0 14px rgba(255,159,67,.45)}}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:16px 0}
+.legend div{font-size:.85rem;color:var(--dim);border-left:3px solid var(--line);padding-left:10px}
+.legend b{font-family:var(--mono);display:block;font-size:.8rem}
+.term{background:#080b10;border:1px solid var(--line);border-radius:10px;margin-top:18px;overflow:hidden}
+.term .top{background:var(--panel);padding:8px 14px;font-family:var(--mono);font-size:.78rem;color:var(--dim);border-bottom:1px solid var(--line)}
+.term .top i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--red)}
+.term .top i:nth-child(2){background:var(--orange)}.term .top i:nth-child(3){background:var(--green)}
+#log{height:240px;overflow-y:auto;padding:12px 14px;font-family:var(--mono);font-size:.82rem}
+#log div{white-space:pre-wrap;word-break:break-word}
+.t{color:var(--dim)}
+footer{padding:30px 0 60px;color:var(--dim);font-family:var(--mono);font-size:.8rem;text-align:center}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}.badge{min-width:112px}th:nth-child(3),td:nth-child(3){display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+details.mr{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+details.mr[open]{border-color:rgba(0,242,254,.5)}
+details.mr summary{cursor:pointer;padding:14px 18px;font-family:var(--mono);font-weight:600;list-style:none;display:flex;gap:12px;align-items:center}
+details.mr summary::-webkit-details-marker{display:none}
+details.mr summary::before{content:"▸";color:var(--cyan);transition:.2s}
+details.mr[open] summary::before{transform:rotate(90deg)}
+details.mr summary:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+details.mr summary small{color:var(--dim);font-weight:400}
+.mr .body{padding:0 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mr .body p{margin:0 0 12px;color:var(--dim);font-size:.92rem}
+.mr .mini{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.8rem}
+.mr .out{height:150px;overflow-y:auto}
+.mr .out div{white-space:pre-wrap}
+.mr .btn{padding:9px 14px;font-size:.82rem;margin:0 8px 10px 0}
+.mr .ghost{padding:9px 14px;font-size:.82rem;margin:0 8px 10px 0}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:5px;margin:10px 0}
+.cell{height:30px;border-radius:4px;border:1px solid;font-size:.62rem;display:flex;align-items:center;justify-content:center}
+.cmp{margin:8px 0}.cmp .row{display:flex;justify-content:space-between;margin-bottom:3px}
+.mr input[type=range]{accent-color:var(--cyan);vertical-align:middle}
+@media(max-width:820px){.mr .body{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>UDIT<span class="cy">flix</span> · hilos en Java</h1>
+  <p class="lead">Semana 6 de PSP. Un backend de streaming recibe cuatro fragmentos de vídeo a la vez. Si los procesas uno tras otro, el usuario se va a otra plataforma. Aquí ves por qué los hilos lo cambian todo, y cómo espiar lo que hacen por dentro antes del Reto 3.</p>
+  <nav><a href="#s1">1 · Secuencial vs. concurrente</a><a href="#s2">2 · Ciclo de vida del hilo</a><a href="#s3">3 · Mini-retos</a></nav>
+</header>
+
+<!-- ============ SECCIÓN 1 ============ -->
+<section id="s1">
+  <h2><span class="tag">//</span> El salto del monoproceso al multihilo</h2>
+  <p class="sub">Mismos cuatro vídeos, mismo trabajo. A la izquierda, el hilo <b>main</b> hace todo solo. A la derecha, cuatro hilos trabajan a la vez y main espera con <code>join()</code>. Las duraciones están simuladas en milisegundos.</p>
+
+  <div class="bar-top">
+    <button class="btn" id="go1">Iniciar transcodificación masiva</button>
+    <button class="ghost" id="reset1">Reiniciar</button>
+  </div>
+
+  <div class="grid2">
+    <article class="card" id="cardSeq">
+      <h3>Modo secuencial · <span style="color:var(--orange)">main</span> hace todo</h3>
+      <p class="hint">Cada <code>run()</code> bloquea al hilo main hasta que termina.</p>
+<pre class="code"><span class="k">for</span> (Transcoder t : jobs) {
+    t.<span class="m">run</span>();   <span class="c">// NO crea hilo: se ejecuta en main</span>
+}</pre>
+      <div id="seqJobs"></div>
+      <div class="clock"><span class="lbl">tiempo total · ~8,2 s</span><span class="val" id="seqClock">0 ms</span></div>
+    </article>
+
+    <article class="card" id="cardPar">
+      <h3>Modo concurrente · <span style="color:var(--cyan)">4 hilos</span> en paralelo</h3>
+      <p class="hint">Cada <code>start()</code> abre un hilo nuevo. <code>join()</code> espera a todos.</p>
+<pre class="code"><span class="k">for</span> (Thread h : hilos) h.<span class="m">start</span>();  <span class="c">// lanza</span>
+<span class="k">for</span> (Thread h : hilos) h.<span class="m">join</span>();   <span class="c">// espera</span></pre>
+      <div id="parJobs"></div>
+      <div class="clock"><span class="lbl">tiempo total · ~3,0 s</span><span class="val" id="parClock">0 ms</span></div>
+    </article>
+  </div>
+
+  <div class="verdict" id="verdict1">Pulsa el botón y observa quién llega antes a la meta.</div>
+</section>
+
+<!-- ============ SECCIÓN 2 ============ -->
+<section id="s2">
+  <h2><span class="tag">//</span> El espía de estados</h2>
+  <p class="sub">Un hilo no está simplemente “encendido” o “apagado”. Con <code>getState()</code> puedes ver en qué momento exacto de su vida está. Pulsa el botón y mira cómo respiran los workers de UDITflix.</p>
+
+  <div class="bar-top">
+    <button class="btn" id="go2">Inspeccionar workers de UDITflix</button>
+    <button class="ghost" id="reset2">Limpiar consola</button>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Worker</th><th>getState()</th><th>Tarea</th><th>sleep()</th></tr></thead>
+      <tbody id="workers"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <div style="border-color:var(--dim)"><b>NEW</b>El objeto Thread existe, pero aún no has llamado a start().</div>
+    <div style="border-color:var(--cyan)"><b>RUNNABLE</b>Listo o ejecutándose en CPU. El planificador decide cuándo le toca.</div>
+    <div style="border-color:var(--orange)"><b>TIMED_WAITING</b>Duerme un tiempo fijo con Thread.sleep(). Aquí simulamos el renderizado.</div>
+    <div style="border-color:var(--green)"><b>TERMINATED</b>run() ha terminado. Este hilo no se puede reiniciar.</div>
+  </div>
+
+  <div class="term">
+    <div class="top"><i></i><i></i><i></i> uditflix@worker-pool:~$ tail -f threads.log</div>
+    <div id="log" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ SECCIÓN 3 ============ -->
+<section id="s3">
+  <h2><span class="tag">//</span> Laboratorio: los 4 mini-retos</h2>
+  <p class="sub">Lo que vais a programar hoy en el aula. Abre cada reto, mira la idea clave, ejecuta la demo y después llévala a vuestro IDE. Son la base del Reto 3.</p>
+
+  <details class="mr" open>
+    <summary>Mini-reto A · El espía de estados <small>getState() + isAlive()</small></summary>
+    <div class="body">
+      <div>
+        <p>Un bucle supervisor en <b>main</b> pregunta cada 500 ms cómo está el worker. Mientras <code>isAlive()</code> sea true, sigue vivo. Cuidado: antes de <code>start()</code> el hilo está en NEW y <code>isAlive()</code> da false.</p>
+<pre class="code">worker.<span class="m">start</span>();
+<span class="k">while</span> (worker.<span class="m">isAlive</span>()) {
+  System.out.println(worker.<span class="m">getState</span>());
+  Thread.<span class="m">sleep</span>(500);
+}
+System.out.println(worker.<span class="m">getState</span>()); <span class="c">// TERMINATED</span></pre>
+      </div>
+      <div>
+        <button class="btn" id="aGo">Lanzar supervisor</button><span class="badge NEW" id="aBadge">NEW</span>
+        <div class="mini out" id="aOut"></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="mr">
+    <summary>Mini-reto B · Secuencial vs. concurrente <small>medición real</small></summary>
+    <div class="body">
+      <div>
+        <p>Mide con <code>System.nanoTime()</code> antes y después. Esta demo mide de verdad con el reloj del navegador (<code>performance.now()</code>) las mismas tareas a escala 1:10. No es una animación: el tiempo sale de la ejecución.</p>
+<pre class="code"><span class="k">long</span> t0 = System.<span class="m">nanoTime</span>();
+<span class="k">for</span> (Thread h : hilos) h.<span class="m">run</span>();      <span class="c">// secuencial</span>
+<span class="k">long</span> seq = (System.nanoTime() - t0) / 1_000_000;
+<span class="c">// repite con h.start() + h.join()</span></pre>
+      </div>
+      <div>
+        <button class="btn" id="bGo">Medir ahora</button>
+        <div class="mini">
+          <div class="cmp"><div class="row"><span>.run() en main</span><span id="bSeqT">— ms</span></div><div class="track"><div class="fill" id="bSeq" style="background:var(--orange)"></div></div></div>
+          <div class="cmp"><div class="row"><span>.start() + .join()</span><span id="bParT">— ms</span></div><div class="track"><div class="fill" id="bPar"></div></div></div>
+          <div id="bRes" style="margin-top:10px;color:var(--dim)">Pulsa «Medir ahora».</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="mr">
+    <summary>Mini-reto C · Worker dinámico con ArrayList <small>ArrayList&lt;Thread&gt;</small></summary>
+    <div class="body">
+      <div>
+        <p>Con 4 hilos puedes escribir cuatro variables. Con 40 necesitas una colección: un bucle crea y arranca, otro hace <code>join()</code>. Cambia N y lanza.</p>
+<pre class="code">ArrayList&lt;Thread&gt; hilos = <span class="k">new</span> ArrayList&lt;&gt;();
+<span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; n; i++) {
+  Thread h = <span class="k">new</span> Thread(<span class="k">new</span> Worker(i));
+  hilos.<span class="m">add</span>(h);  h.<span class="m">start</span>();
+}
+<span class="k">for</span> (Thread h : hilos) h.<span class="m">join</span>();</pre>
+      </div>
+      <div>
+        <label>N = <b id="cN">20</b> <input type="range" id="cRange" min="4" max="40" value="20"></label><br><br>
+        <button class="btn" id="cGo">Lanzar workers</button>
+        <div class="mini"><div id="cInfo" style="color:var(--dim)">vivos: 0 / 20</div><div class="cells" id="cells"></div></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="mr">
+    <summary>Mini-reto D · Cancelación con interrupt() <small>InterruptedException</small></summary>
+    <div class="body">
+      <div>
+        <p><code>interrupt()</code> despierta a un hilo dormido: <code>sleep()</code> lanza <code>InterruptedException</code>. El worker la captura, hace <code>return</code> y pasa a TERMINATED. Limpio, sin matar nada a la fuerza.</p>
+<pre class="code"><span class="k">public void</span> <span class="m">run</span>() {
+  <span class="k">try</span> { Thread.<span class="m">sleep</span>(8000); }
+  <span class="k">catch</span> (InterruptedException e) {
+    System.out.println(<span class="s">"cancelado"</span>);
+    <span class="k">return</span>;  <span class="c">// sale limpio</span>
+  }
+}
+<span class="c">// en main:</span> worker.<span class="m">interrupt</span>();</pre>
+      </div>
+      <div>
+        <button class="btn" id="dGo">start()</button><button class="ghost" id="dInt" disabled>interrupt()</button><span class="badge NEW" id="dBadge">NEW</span>
+        <div class="mini">
+          <div class="track" style="margin-bottom:8px"><div class="fill" id="dBar" style="background:var(--orange)"></div></div>
+          <div class="out" id="dOut" style="height:110px"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>
+
+<footer>UDITflix · Programación de Servicios y Procesos · Semana 6 → Reto 3</footer>
+</div>
+
+<script>
+/* =====================================================================
+   DATOS COMUNES
+   Duraciones simuladas (ms). Si las cambias, todo el demo se recalcula.
+   ===================================================================== */
+const VIDEOS = [
+  { name: "intro.mp4",      ms: 1200 },
+  { name: "episodio-1.mp4", ms: 3000 },
+  { name: "episodio-2.mp4", ms: 2400 },
+  { name: "extras.mp4",     ms: 1600 }
+];
+const TOTAL_SEQ = VIDEOS.reduce((a, v) => a + v.ms, 0);   // suma: 8200 ms
+const TOTAL_PAR = Math.max(...VIDEOS.map(v => v.ms));     // el más largo: 3000 ms
+
+const $ = id => document.getElementById(id);
+
+/* =====================================================================
+   SECCIÓN 1 · Secuencial vs. concurrente
+   Idea de la animación: UN SOLO reloj (requestAnimationFrame).
+   En cada fotograma calculamos "t" = ms transcurridos y, a partir de él,
+   deducimos el progreso de cada barra. No hay setInterval por barra:
+   así ambos paneles están perfectamente sincronizados.
+   ===================================================================== */
+
+// Crea las 4 filas (nombre + estado + barra) dentro de un contenedor
+function buildJobs(containerId, prefix) {
+  $(containerId).innerHTML = VIDEOS.map((v, i) => `
+    <div class="job">
+      <div class="row"><span>${v.name}</span><span class="st" id="${prefix}St${i}">en cola · ${v.ms} ms</span></div>
+      <div class="track"><div class="fill" id="${prefix}Fill${i}"></div></div>
+    </div>`).join("");
+}
+buildJobs("seqJobs", "seq");
+buildJobs("parJobs", "par");
+
+let raf1 = null;   // id del frame en curso (para poder cancelarlo)
+
+function reset1() {
+  cancelAnimationFrame(raf1);
+  buildJobs("seqJobs", "seq");
+  buildJobs("parJobs", "par");
+  $("seqClock").textContent = "0 ms";
+  $("parClock").textContent = "0 ms";
+  $("cardSeq").className = "card";
+  $("cardPar").className = "card";
+  $("verdict1").innerHTML = "Pulsa el botón y observa quién llega antes a la meta.";
+  $("go1").disabled = false;
+}
+
+function start1() {
+  reset1();
+  $("go1").disabled = true;
+  $("cardSeq").classList.add("run");
+  $("cardPar").classList.add("run");
+  const t0 = performance.now();
+  let seqDone = false, parDone = false;
+
+  function frame(now) {
+    const t = now - t0;   // ms desde que se pulsó el botón
+
+    /* --- MODO SECUENCIAL ---
+       Cada vídeo empieza cuando acaba el anterior.
+       "inicio" = suma de las duraciones previas.                      */
+    let inicio = 0;
+    VIDEOS.forEach((v, i) => {
+      const p = Math.min(1, Math.max(0, (t - inicio) / v.ms));  // progreso 0..1
+      setBar("seq", i, p, p > 0 && p < 1, v);
+      inicio += v.ms;
+    });
+    if (!seqDone) $("seqClock").textContent = Math.min(t, TOTAL_SEQ).toFixed(0) + " ms";
+    if (!seqDone && t >= TOTAL_SEQ) { seqDone = true; $("cardSeq").className = "card done"; }
+
+    /* --- MODO CONCURRENTE ---
+       Todos empiezan en t = 0, cada uno con su propia duración.
+       El tiempo total es el del vídeo más largo (join espera a ese).  */
+    VIDEOS.forEach((v, i) => {
+      const p = Math.min(1, t / v.ms);
+      setBar("par", i, p, p < 1, v);
+    });
+    if (!parDone) $("parClock").textContent = Math.min(t, TOTAL_PAR).toFixed(0) + " ms";
+    if (!parDone && t >= TOTAL_PAR) {
+      parDone = true; $("cardPar").className = "card done";
+      $("verdict1").innerHTML = "Concurrente terminó en <b>" + TOTAL_PAR + " ms</b>. El secuencial sigue trabajando…";
+    }
+
+    if (!(seqDone && parDone)) { raf1 = requestAnimationFrame(frame); return; }
+
+    // Ambos han terminado: mostramos el ahorro
+    const ahorro = ((1 - TOTAL_PAR / TOTAL_SEQ) * 100).toFixed(0);
+    $("verdict1").innerHTML =
+      "Secuencial: " + TOTAL_SEQ + " ms (suma de los 4) · Concurrente: " + TOTAL_PAR +
+      " ms (el más largo). Ahorro: <b>" + ahorro + "%</b> · <b>" + (TOTAL_SEQ / TOTAL_PAR).toFixed(1) +
+      "×</b> más rápido. Error típico: llamar a <code>run()</code> no crea ningún hilo, todo corre en main. Con 40 vídeos, la diferencia separa un servicio usable de uno caído.";
+    $("go1").disabled = false;
+  }
+  raf1 = requestAnimationFrame(frame);
+}
+
+// Pinta una barra: ancho, color y texto de estado
+function setBar(prefix, i, p, running, v) {
+  const f = $(prefix + "Fill" + i), s = $(prefix + "St" + i);
+  f.style.width = (p * 100) + "%";
+  f.classList.toggle("ok", p >= 1);
+  s.textContent = p >= 1 ? "✓ completado" : running ? Math.round(p * 100) + "%" : "en cola · " + v.ms + " ms";
+  s.style.color = p >= 1 ? "var(--green)" : running ? "var(--cyan)" : "";
+}
+
+$("go1").addEventListener("click", start1);
+$("reset1").addEventListener("click", reset1);
+
+/* =====================================================================
+   SECCIÓN 2 · Ciclo de vida del hilo
+   Cada worker sigue este guion (línea de tiempo en ms):
+     t=0                 → NEW            (new Thread(...))
+     t = arranque        → RUNNABLE       (start())
+     t = arranque + 300  → TIMED_WAITING  (Thread.sleep(dur))
+     t = ... + dur       → RUNNABLE       (despierta)
+     t = ... + 250       → TERMINATED     (run() acaba)
+   Todo se programa con setTimeout y se guarda en "timers" para poder
+   cancelarlo si el usuario vuelve a pulsar el botón.
+   ===================================================================== */
+const WORKERS = [
+  { id: 1, task: "intro.mp4",      sleep: 1200, arranque: 300 },
+  { id: 2, task: "episodio-1.mp4", sleep: 2800, arranque: 600 },
+  { id: 3, task: "episodio-2.mp4", sleep: 2200, arranque: 900 },
+  { id: 4, task: "extras.mp4",     sleep: 1600, arranque: 1200 }
+];
+let timers = [];       // ids de setTimeout pendientes
+let tInicio = 0;       // instante en que empezó la simulación
+
+// Dibuja la tabla con todos los workers en NEW
+function renderWorkers() {
+  $("workers").innerHTML = WORKERS.map(w => `
+    <tr>
+      <td>WORKER-${w.id}</td>
+      <td><span class="badge NEW" id="b${w.id}">NEW</span></td>
+      <td>${w.task}</td>
+      <td>${w.sleep} ms</td>
+    </tr>`).join("");
+}
+renderWorkers();
+
+// Cambia el estado de un worker: badge + línea de log con marca de tiempo
+function setState(w, estado) {
+  const b = $("b" + w.id);
+  b.className = "badge " + estado;   // la clase CSS define el color
+  b.textContent = estado;
+  const seg = ((performance.now() - tInicio) / 1000).toFixed(1);
+  const color = { NEW: "var(--dim)", RUNNABLE: "var(--cyan)", TIMED_WAITING: "var(--orange)", TERMINATED: "var(--green)" }[estado];
+  log(`<span class="t">[ +${seg}s ]</span> [WORKER-${w.id}] -> <span style="color:${color}">${estado}</span>`);
+}
+
+// Añade una línea a la consola y hace scroll hasta el final
+function log(html) {
+  const l = $("log");
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  l.appendChild(d);
+  l.scrollTop = l.scrollHeight;
+}
+
+// Programa una acción "ms" milisegundos después del inicio
+function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+function start2() {
+  timers.forEach(clearTimeout); timers = [];
+  renderWorkers();
+  $("log").innerHTML = "";
+  $("go2").disabled = true;
+  tInicio = performance.now();
+
+  log(`<span class="t">[ +0.0s ]</span> [MAIN] creando ${WORKERS.length} workers…`);
+  WORKERS.forEach(w => setState(w, "NEW"));
+
+  let fin = 0;   // cuándo termina el último worker (para liberar join)
+  WORKERS.forEach(w => {
+    const tSleep = w.arranque + 300;           // entra en TIMED_WAITING
+    const tDespierta = tSleep + w.sleep;       // sale del sleep
+    const tFin = tDespierta + 250;             // run() termina
+    fin = Math.max(fin, tFin);
+
+    at(w.arranque, () => setState(w, "RUNNABLE"));
+    at(tSleep,     () => setState(w, "TIMED_WAITING"));
+    at(tDespierta, () => setState(w, "RUNNABLE"));
+    at(tFin,       () => setState(w, "TERMINATED"));
+  });
+
+  // Cuando el último worker muere, main se desbloquea del join()
+  at(fin + 200, () => {
+    const seg = ((performance.now() - tInicio) / 1000).toFixed(1);
+    log(`<span class="t">[ +${seg}s ]</span> [MAIN] join() liberado → <span style="color:var(--green)">todos los vídeos listos</span>`);
+    $("go2").disabled = false;
+  });
+}
+
+$("go2").addEventListener("click", start2);
+$("reset2").addEventListener("click", () => {
+  timers.forEach(clearTimeout); timers = [];
+  $("log").innerHTML = ""; renderWorkers(); $("go2").disabled = false;
+});
+
+/* =====================================================================
+   SECCIÓN 3 · Mini-retos
+   Utilidades comunes: pausa asíncrona, log en una mini-consola y badge.
+   ===================================================================== */
+const pausa = ms => new Promise(r => setTimeout(r, ms));
+function mlog(id, html, limpiar) {
+  const e = $(id);
+  if (limpiar) e.innerHTML = "";
+  const d = document.createElement("div"); d.innerHTML = html;
+  e.appendChild(d); e.scrollTop = e.scrollHeight;
+}
+function badge(id, estado) { const b = $(id); b.className = "badge " + estado; b.textContent = estado; }
+
+/* ---------- A · Supervisor con getState() / isAlive() ----------
+   Calculamos el estado del worker según los ms transcurridos.
+   Modifica el array GUION_A para cambiar la vida del hilo:
+   [estado, hasta qué ms dura]                                        */
+const GUION_A = [["RUNNABLE", 300], ["TIMED_WAITING", 2300], ["RUNNABLE", 2500]];
+function estadoA(t) {
+  for (const [est, hasta] of GUION_A) if (t < hasta) return est;
+  return "TERMINATED";
+}
+$("aGo").onclick = async () => {
+  $("aGo").disabled = true;
+  mlog("aOut", `<span class="t">[main]</span> new Thread() → NEW, isAlive=<span style="color:var(--red)">false</span>`, true);
+  badge("aBadge", "NEW"); await pausa(600);
+  mlog("aOut", `<span class="t">[main]</span> worker.start()`);
+  const t0 = performance.now();
+  // Bucle supervisor: cada 500 ms pregunta estado y vida
+  while (true) {
+    const t = performance.now() - t0, est = estadoA(t), vivo = est !== "TERMINATED";
+    badge("aBadge", est);
+    mlog("aOut", `<span class="t">[ +${(t/1000).toFixed(1)}s ]</span> ${est} isAlive=<span style="color:var(--${vivo?"green":"red"})">${vivo}</span>`);
+    if (!vivo) break;
+    await pausa(500);
+  }
+  mlog("aOut", `<span class="t">[main]</span> bucle terminado: el worker ha muerto`);
+  $("aGo").disabled = false;
+};
+
+/* ---------- B · Medición real run() vs start() ----------
+   ESCALA divide las duraciones de VIDEOS para que la demo sea rápida.
+   El secuencial espera cada tarea una tras otra (await en serie);
+   el concurrente las lanza todas y espera con Promise.all (= join).   */
+const ESCALA = 10;
+$("bGo").onclick = async () => {
+  $("bGo").disabled = true;
+  ["bSeq", "bPar"].forEach(i => $(i).style.width = "0");
+  $("bSeqT").textContent = $("bParT").textContent = "… ms";
+  const tareas = VIDEOS.map(v => v.ms / ESCALA);
+
+  let t0 = performance.now();
+  for (const ms of tareas) await pausa(ms);                 // uno tras otro
+  const seq = performance.now() - t0;
+  $("bSeq").style.width = "100%"; $("bSeqT").textContent = seq.toFixed(0) + " ms";
+
+  t0 = performance.now();
+  await Promise.all(tareas.map(ms => pausa(ms)));           // todos a la vez
+  const par = performance.now() - t0;
+  $("bPar").style.width = (par / seq * 100) + "%"; $("bParT").textContent = par.toFixed(0) + " ms";
+
+  $("bRes").innerHTML = `Medido: <b style="color:var(--green)">${(seq/par).toFixed(1)}× más rápido</b>. Si en tu código sale casi igual, has llamado a <code>run()</code> en vez de <code>start()</code>.`;
+  $("bGo").disabled = false;
+};
+
+/* ---------- C · ArrayList<Thread> con N workers ----------
+   Cada celda es un hilo. Sleep aleatorio entre SLEEP_MIN y SLEEP_MAX.   */
+const SLEEP_MIN = 400, SLEEP_MAX = 1800;
+let timersC = [];
+$("cRange").oninput = e => { $("cN").textContent = e.target.value; $("cInfo").textContent = "vivos: 0 / " + e.target.value; };
+$("cGo").onclick = () => {
+  timersC.forEach(clearTimeout); timersC = [];
+  const n = +$("cRange").value;
+  $("cells").innerHTML = Array.from({length: n}, (_, i) => `<div class="cell NEW" id="c${i}">${i}</div>`).join("");
+  let vivos = 0;
+  const info = () => $("cInfo").innerHTML = `vivos: <b>${vivos}</b> / ${n}`;
+  const set = (i, e) => { const c = $("c" + i); c.className = "cell " + e; };
+  info();
+  for (let i = 0; i < n; i++) {
+    const dur = SLEEP_MIN + Math.random() * (SLEEP_MAX - SLEEP_MIN);
+    const ini = i * 40;                                      // start() escalonado
+    timersC.push(setTimeout(() => { set(i, "RUNNABLE"); vivos++; info(); }, ini));
+    timersC.push(setTimeout(() => set(i, "TIMED_WAITING"), ini + 150));
+    timersC.push(setTimeout(() => { set(i, "TERMINATED"); vivos--; info();
+      if (vivos === 0 && $("c" + (n-1)).classList.contains("TERMINATED")) $("cInfo").innerHTML = `vivos: 0 / ${n} · <b style="color:var(--green)">join() completo</b>`;
+    }, ini + 150 + dur));
+  }
+};
+
+/* ---------- D · Cancelación con interrupt() ----------
+   El worker "duerme" DURACION_D ms. interrupt() corta el sleep y
+   dispara InterruptedException; el worker hace return.               */
+const DURACION_D = 8000;
+let tickD = null, finD = null;
+$("dGo").onclick = () => {
+  $("dGo").disabled = true; $("dInt").disabled = false;
+  const t0 = performance.now();
+  mlog("dOut", `<span class="t">[main]</span> worker.start()`, true);
+  badge("dBadge", "RUNNABLE");
+  setTimeout(() => { if (tickD) { badge("dBadge", "TIMED_WAITING"); mlog("dOut", `<span class="t">[WORKER]</span> Thread.sleep(${DURACION_D})`); } }, 300);
+  // El "tick" avanza la barra; si llega al 100% el sleep termina solo
+  tickD = setInterval(() => {
+    const p = Math.min(1, (performance.now() - t0) / DURACION_D);
+    $("dBar").style.width = (p * 100) + "%";
+    if (p >= 1) { clearInterval(tickD); tickD = null; terminarD("sleep completo, run() acaba"); }
+  }, 50);
+};
+$("dInt").onclick = async () => {
+  if (!tickD) return;
+  clearInterval(tickD); tickD = null; $("dInt").disabled = true;   // el sleep se corta aquí
+  mlog("dOut", `<span class="t">[main]</span> worker.interrupt()`);
+  badge("dBadge", "RUNNABLE"); await pausa(400);
+  mlog("dOut", `<span class="t">[WORKER]</span> <span style="color:var(--red)">InterruptedException</span> capturada`);
+  await pausa(400);
+  mlog("dOut", `<span class="t">[WORKER]</span> return; → salida limpia`);
+  await pausa(300);
+  terminarD("cancelado correctamente");
+};
+function terminarD(msg) {
+  badge("dBadge", "TERMINATED");
+  mlog("dOut", `<span class="t">[main]</span> <span style="color:var(--green)">TERMINATED</span> · ${msg}`);
+  $("dGo").disabled = false; $("dInt").disabled = true;
+}
+</script>
+</body>
+</html>
