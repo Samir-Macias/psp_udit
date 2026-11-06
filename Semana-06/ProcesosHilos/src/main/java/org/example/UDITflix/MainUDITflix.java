@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * BASE DEL JUEVES (versión que se da al alumnado): 4 hilos creados "a mano".
+ * UDITflix · Reto 3: descarga concurrente de módulos con hilos.
  *
- * Pasos que se explican en la píldora:
+ * Lanza cuatro hilos (catálogo, sesión, portadas y analíticas), cada uno con
+ * una latencia aleatoria, y compara el tiempo total real con la suma de
+ * latencias para evidenciar el beneficio de la concurrencia.
+ *
+ * Pasos:
  * 1) Crear las tareas (Runnable).
  * 2) Envolver cada tarea en un Thread con nombre propio.
- * 3) Lanzar con start() (NUNCA run()).
- * 4) Esperar con join() (para que main no dé el resultado antes de tiempo).
- *
- * Después de la píldora, el alumnado resuelve los mini-retos A, B y C sobre
- * esta base.
+ * 3) Asignar prioridades y lanzar con start() (nunca run(), que no crea hilo).
+ * 4) Esperar con join() para no calcular resultados antes de que terminen.
  */
 public class MainUDITflix {
     public static void main(String[] args) throws InterruptedException {
@@ -22,8 +23,7 @@ public class MainUDITflix {
         System.out.println("==================================================");
 
         Random azar = new Random();
-        // Duración aleatoria entre 1000 y 4000 ms: así el orden de llegada cambia cada
-        // vez.
+        // Latencia simulada aleatoria (1000-4000 ms): el orden de llegada cambia en cada ejecución.
         int latenciaCatalogo = 1000 + azar.nextInt(3001);
         int latenciaSesion = 1000 + azar.nextInt(3001);
         int latenciaPortadas = 1000 + azar.nextInt(3001);
@@ -31,7 +31,7 @@ public class MainUDITflix {
 
         long inicio = System.currentTimeMillis();
 
-        // 1) Tareas
+        // 1) Tareas: definen qué hace cada hilo
         ArrayList<TareaDescarga> tareas = new ArrayList<>();
         TareaDescarga tcatalogo;
         TareaDescarga tsesion;
@@ -42,14 +42,13 @@ public class MainUDITflix {
         tareas.add(tportadas = new TareaDescarga("portadas-assets", latenciaPortadas));
         tareas.add(tanaliticas = new TareaDescarga("analiticas", latenciaAnaliticas));
 
-        // 2) Hilos con nombre
+        // 2) Hilos con nombre propio (facilita seguir la traza)
         Thread hcatalogo = new Thread(tcatalogo, "DL-catalogo");
         Thread hsesion = new Thread(tsesion, "DL-sesion");
         Thread hportadas = new Thread(tportadas, "DL-portadas");
         Thread hanaliticas = new Thread(tanaliticas, "DL-analiticas");
 
-        // 3) Agregar prioridad a cada modulo
-
+        // 3) Prioridades: son solo una sugerencia al planificador, no garantizan el orden
         hcatalogo.setPriority(Thread.MAX_PRIORITY);
         hsesion.setPriority(Thread.MAX_PRIORITY);
         hportadas.setPriority(Thread.NORM_PRIORITY);
@@ -61,17 +60,18 @@ public class MainUDITflix {
         hilos.add(hportadas);
         hilos.add(hanaliticas);
 
-        // 3) Lanzamiento concurrente
+        // 4) Lanzamiento concurrente
         System.out.println("[MAIN] Lanzando workers...\n");
         for (Thread h : hilos) {
             h.start();
         }
 
-        // 4) Espera: main se bloquea hasta que cada hilo termina
+        // 5) Espera: main se bloquea hasta que cada hilo termina
         for (Thread h : hilos) {
             h.join();
         }
 
+        // Métricas: tiempo real transcurrido, latencia máxima y suma secuencial
         long total = System.currentTimeMillis() - inicio;
         int masLento = 0;
         int suma = 0;

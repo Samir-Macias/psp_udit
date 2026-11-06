@@ -1,10 +1,10 @@
 package org.example.UDITflix;
 
 /**
- * UDITflix · Motor concurrente (pre-reto / base v0 del Reto 3)
+ * Tarea que simula la descarga de un módulo de UDITflix.
  *
- * Simula la transcodificación de un vídeo. Implementa Runnable:
- * esta clase define QUÉ hace el hilo; el Thread define CÓMO se ejecuta.
+ * Implementa Runnable: esta clase define QUÉ hace el hilo; el Thread define
+ * CÓMO se ejecuta. La descarga se simula con Thread.sleep(latencia).
  */
 public class TareaDescarga implements Runnable {
 
@@ -25,13 +25,13 @@ public class TareaDescarga implements Runnable {
             hiloActual, prioridad, modulo, latencia);
 
         try {
-            // Simulamos el trabajo. Mientras duerme, el hilo está en TIMED_WAITING.
+            // Simula el trabajo; mientras duerme, el hilo está en estado TIMED_WAITING
             Thread.sleep(latencia);
         } catch (InterruptedException e) {
             System.err.printf("!--> [%-13s | Prioridad=%-2d] %-19s CANCELADO.%n",
                 hiloActual, prioridad, modulo);
-            Thread.currentThread().interrupt(); // restaurar el aviso de interrupción
-            return; // IMPORTANTE: sin este return se imprimiría "COMPLETADO" aunque se cancelara
+            Thread.currentThread().interrupt(); // restaura el flag de interrupción
+            return; // sin este return se imprimiría "COMPLETADO" aunque se cancelara
         }
 
         System.out.printf("<-- [%-13s | Prioridad=%-2d] ¡COMPLETADO! %s%n",
