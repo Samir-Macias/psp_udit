@@ -3,7 +3,7 @@
 **Prueba realizada:** ☐ A · Pipeline de Transcodificación de Tráilers · **☒ B · Optimizador de Descarga Masiva de Assets**  
 **Autor/a:** Samir Adrian Macías Hernández  
 **Repositorio:** [Samir-Macias/psp_udit](https://github.com/Samir-Macias/psp_udit)  
-**Vídeo de defensa técnica (< 3 min):** [Enlace de la defensa en la plataforma]
+**Vídeo de defensa técnica (< 3 min):** [Ver vídeo](https://365udit-my.sharepoint.com/:v:/g/personal/samiradrian_macias_alumfp_udit_es/IQDINktIhe6KSpXXzS6SQaYXAauxJgfE0OOjjuy96nOF8ZU?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=fUuj6h)
 
 ---
 
